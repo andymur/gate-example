@@ -7,22 +7,40 @@
   <version>1.0-SNAPSHOT</version>
   <name>sample</name>
   <url>http://maven.apache.org</url>
+
+  <properties>
+       <junit.version>3.8.1</junit.version>
+       <twitter4j.version>4.0.0</twitter4j.version>
+       <gate.version>8.0</gate.version>
+       <guava.version>18.0</guava.version>
+  </properties>
+
   <dependencies>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
-	<groupId>uk.ac.gate</groupId>
-	<artifactId>gate-core</artifactId>
-	<version>8.0</version>
+      <groupId>org.twitter4j</groupId>
+      <artifactId>twitter4j-core</artifactId>
+      <version>${twitter4j.version}</version>
     </dependency>
+
     <dependency>
-	<groupId>com.google.guava</groupId>
-	<artifactId>guava</artifactId>
-	<version>18.0</version>
+	  <groupId>uk.ac.gate</groupId>
+	  <artifactId>gate-core</artifactId>
+	  <version>${gate.version}</version>
     </dependency>
+
+    <dependency>
+	  <groupId>com.google.guava</groupId>
+	  <artifactId>guava</artifactId>
+	  <version>${guava.version}</version>
+    </dependency>
+
   </dependencies>
 </project>
