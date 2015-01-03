@@ -118,19 +118,19 @@
           <version>${velocity.version}</version>
       </dependency>
 
-      <dependency>
+      <!--dependency>
           <groupId>org.apache.velocity</groupId>
           <artifactId>velocity-tools</artifactId>
           <version>${velocity-tools.version}</version>
-      </dependency>
+      </dependency-->
 
       <!-- jackson library for JSON handling -->
 
-      <dependency>
+      <!--dependency>
           <groupId>org.codehaus.jackson</groupId>
           <artifactId>jackson-mapper-asl</artifactId>
           <version>${jackson.version}</version>
-      </dependency>
+      </dependency-->
 
 
   </dependencies>

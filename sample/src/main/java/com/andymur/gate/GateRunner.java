@@ -16,7 +16,6 @@ import gate.util.persistence.PersistenceManager;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,33 +30,34 @@ class GateRunner {
         ConditionalSerialAnalyserController controller = null;
         try {
 			controller = init();
+
+            System.out.println("initialization completed");
+
+            Corpus corpus
+                    = createCorpusFromDocument("my corpus", DEFAULT_FILE_NAME);
+
+            if (controller != null) {
+                controller.setCorpus(corpus);
+
+                System.out.println("corpus loaded");
+                controller.execute();
+
+                Document document = corpus.get(0);
+
+                Map<String, String> nameToAnnotations = Maps.newHashMap(ImmutableMap.<String, String>of(
+                        "position", "JobTitle", "person", "Person", "address", "Address", "organization", "Organization"));
+
+                for (String name: nameToAnnotations.keySet()) {
+                    Set<String> content = getContentAnnotatedBy(document, nameToAnnotations.get(name));
+                    System.out.println("category: " + name + " values: " + content);
+                }
+            }
+
 		} catch (Exception e) {
 			System.out.println("initialization error occured!");
 			System.out.println(e);
 			e.printStackTrace();
 		}
-
-        System.out.println("initialization completed");
-
-        Corpus corpus
-                = createCorpusFromDocument("my corpus", DEFAULT_FILE_NAME);
-
-        if (controller != null) {
-            controller.setCorpus(corpus);
-
-            System.out.println("corpus loaded");
-            controller.execute();
-
-            Document document = corpus.get(0);
-
-            Map<String, String> nameToAnnotations = Maps.newHashMap(ImmutableMap.<String, String>of(
-                    "position", "JobTitle", "person", "Person", "address", "Address", "organization", "Organization"));
-
-            for (String name: nameToAnnotations.keySet()) {
-                Set<String> content = getContentAnnotatedBy(document, nameToAnnotations.get(name));
-                System.out.println("category: " + name + " values: " + content);
-            }
-        }
 
     }
 
@@ -87,7 +87,7 @@ class GateRunner {
                         Gate.getPluginsHome(), ANNIEConstants.PLUGIN_DIR),
                         ANNIEConstants.DEFAULT_FILE
                 ));
-	}
+    }
 
     private static Corpus createCorpusFromDocument(String name, String documentUrl)
             throws ResourceInstantiationException, MalformedURLException {
