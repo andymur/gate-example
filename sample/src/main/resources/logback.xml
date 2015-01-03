@@ -1,0 +1,18 @@
+<configuration>
+    <appender name="mainlogfile" class="ch.qos.logback.core.FileAppender">
+        <file>qiwi-main.log</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.hibernate" level="debug" />
+
+    <logger name="com.andymur.playground.qiwi" level="debug" additivity="true">
+    </logger>
+
+    <root level="debug">
+        <appender-ref ref="mainlogfile" />
+    </root>
+
+</configuration>
