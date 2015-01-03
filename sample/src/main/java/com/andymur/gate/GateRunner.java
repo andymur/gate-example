@@ -18,7 +18,7 @@ import java.util.Map;
 
 class GateRunner {
 
-    public static final String DEFAULT_FILE_NAME = "file:////home//andymur//workspace//gate-playground//sample//address.txt";
+    public static final String DEFAULT_FILE_NAME = "address.txt";
 
     public static void main(String [] args) throws MalformedURLException, ResourceInstantiationException, ExecutionException {
 		System.out.println("trying to init gate...");
@@ -71,7 +71,7 @@ class GateRunner {
     private static Document createDocumentByUrl(String url) throws ResourceInstantiationException,
             MalformedURLException {
         FeatureMap params = Factory.newFeatureMap();
-        params.put("sourceUrl", new URL(url));
+        params.put("sourceUrl", new File(DEFAULT_FILE_NAME).toURI().toURL());
         params.put("preserveOriginalContent", true);
         params.put("collectRepositioningInfo", true);
         String documentClassName = DocumentImpl.class.getCanonicalName();
