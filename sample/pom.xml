@@ -135,7 +135,7 @@
 
   </dependencies>
     <build>
-    <finalName>QiwiWebApp</finalName>
+    <finalName>GateWebApp</finalName>
     <plugins>
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>

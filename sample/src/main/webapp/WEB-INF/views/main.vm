@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>QiwiApp</title>
+  <title>GateApp</title>
   <script type="text/javascript" src="http://yandex.st/jquery/2.1.1/jquery.js"></script>
   <script type="text/javascript">
     
@@ -12,92 +12,12 @@
     );
 
 
-    function initialization() {      
-      $("#menu_holder .selected").click(
-        topMenuClick
-      )
-
-      $("#providers li").click(
-        leftMenuClick
-      )
-
-      $("#price_value").change(
-        priceValueChange
-      )
-
-    }
-
-    function topMenuClick(e) {
-      var item = $(e.currentTarget);
-      var list = $(e.currentTarget).parent();
-      var anotherItem = item.next().length ? item.next() : item.prev();
-      
-      if (anotherItem.css("display") == "none") {
-        list.prepend(item);
-        list.find("li").css("display", "block");
-      } else {
-        list.find("li").css("display", "none");
-        list.find("li.selected").css("display", "block");
-      }
-    }
-
-    function leftMenuClick(e) {
-        $("#pricetag").hide();
-        $("#price_value").val("");
-
-        var item = $(e.currentTarget);
-        var list = $(e.currentTarget).parent();
-        list.find(".selected").removeClass("selected");
-        item.addClass("selected");
-
-                
-        var id = item.find("a").attr("id").split("_")[1];
-        console.log(id);
-
-        if (parseInt(id)) {
-          
-          $.ajax({
-              'url': 'getRate',
-              'contentType': 'application/json; charset=UTF-8',
-              'data': {'provider': id},
-              'dataType': 'json',
-              'success': onLoadRate,
-              'error': function() {console.error("something went wrong");}
-            }
-          );
-
-        }
-    }
-
-    function onLoadRate(data) {      
-      if (data != undefined && data['rate'] != undefined && parseInt(data['rate'])) {
-        var rate = data['rate'];
-        var title = data['name'];
-        var currency = data['currency'];
-        $("#fee").text(rate);
-        $("#provider_title").text(title);
-        $("#currency_symbol").text(currency);
-        $("#mainform_holder").show();
-      }
-    }
-
-    function priceValueChange(e) {
-      var input = $(e.currentTarget);
-      var value = parseInt(input.val());
-      var fee = parseInt($("#fee").text()) / 100;
-      console.log(fee);
-
-      if (value > 0) {
-        $("#totalprice").text(parseFloat(fee * value + value).toFixed(2));
-        $("#pricetag").show();
-      } else {
-        $("#pricetag").hide();
-        input.val("");
-      }
+    function initialization() {
     }
 
   </script>
   <style type="text/css">
+
    .header{ height: 50px; margin-bottom: 10px;}
    .layout { overflow: hidden; clear: both;}
    .col1 { float: left; width: 200px; font-size: 16pt; border-right: solid 1px; height: 600px;}
@@ -106,71 +26,15 @@
       font-size: 24pt;
    }
 
-   ul {list-style-type: none;}   
-   #menu_holder {right: 10%; position: absolute}
-   #menu_holder > ul {float: left; width: 100px}
-   #menu_holder > ul > li {display: none;}
-   #menu_holder > ul > li.selected {display: block;}
-   #menu_holder > ul a {font-size: 14pt; color: black; font-style: italic;}
-
-   #providers a {text-decoration: none}
-   #providers > li.selected > a {text-decoration: underline; font-style: italic; color: black;}
-
-   #mainform {margin-left: 150px; margin-top: 5%; font-size: 14pt;}
-   #mainform input {font-size: 14pt}
-   #mainform_holder {display: none;}
-   .col3 {border: solid 1px; width: 400px; float: right; }
-
   </style>
  </head>
  <body style="min-width: 700px">
   <div class="header">
-    <div id="menu_holder">
-      <ul id="countries">
-        #foreach ($item in $countryItems)
-          #if ($item.selected)
-            <li class="selected"><a href="#">$item.name</a></li>
-          #else
-            <li><a href="/?locale=${currentLanguageAbbreviation}_${item.abbreviation}">$item.name</a></li>
-          #end
-        #end
-      </ul>
-      <ul id="languages">
-        #foreach ($item in $languageItems)
-          #if ($item.selected)
-            <li class="selected"><a href="#">$item.name</a></li>
-          #else
-            <li><a href="/?locale=${item.abbreviation}_${currentCountryAbbreviation}">$item.name</a></li>
-          #end
-        #end
-      </ul>
-    </div>  
   </div>
   <div class="layout">
    <div class="col1">
-     <center>#springMessage('providers')</center>
-     <ul id="providers">
-        #foreach ($item in $providerItems)
-        <li><a href="#" id="provider_${item.id}">${item.name}</a></li>
-        #end
-     </ul>
    </div>
    <div class="col2">
-      <div id="greetings">
-        <center>#springMessage('greetings')</center>
-      </div>
-      <div id="mainform_holder">
-        <form id="mainform" method="post" action="#">
-          <h2 id="provider_title"></h2>
-          #springMessage('payment'): <input type="text" id="price_value" size="9" maxlength="9" />
-          #springMessage('fee'): <span id="fee"></span>%
-          <div id="pricetag" style="display: none">
-            <div>#springMessage('total_price'): <span id="totalprice"></span><span id="currency_symbol"></span></div>
-            <input type="submit" value="#springMessage('pay')"/>
-          </div>
-        </form>
-        </form>
-      </div>
    </div>
   </div>
  </body>
