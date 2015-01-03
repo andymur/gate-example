@@ -53,6 +53,7 @@ Macro: PHONE_AREACODE
 Macro: PHONE_REG
 // 222 1481
 // 781932
+// 222-1481
 
 (
   ({Token.kind == number,Token.length == "3"}
@@ -63,7 +64,14 @@ Macro: PHONE_REG
                                               |
 
   ({Token.kind == number,Token.length == "5"}|
-   {Token.kind == number,Token.length == "6"})
+   {Token.kind == number,Token.length == "6"}) |
+  
+  ({Token.kind == number, Token.length == "3"}
+   {Token.subkind == dashpunct}
+   {Token.kind == number, Token.length == "3"}
+   {Token.subkind == dashpunct}
+   {Token.kind == number, Token.length == "4"}
+  )
 )
  
 Macro: PHONE_EXT

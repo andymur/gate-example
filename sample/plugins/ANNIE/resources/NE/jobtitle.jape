@@ -15,17 +15,19 @@
 
 
 Phase:	Jobtitle
-Input: Lookup Token
+Input: Token Lookup
 Options: control = appelt
 
 Rule: Jobtitle1
 (
- {Lookup.majorType == jobtitle} 
- (
-  {Lookup.majorType == jobtitle} 
- )?
-)
-:jobtitle
+  {!Token.kind == punctuation}
+  (
+    {Lookup.majorType == jobtitle} 
+    (
+      {Lookup.majorType == jobtitle} 
+    )?
+  ):jobtitle
+):a
 -->
  :jobtitle.JobTitle = {rule = "JobTitle1"}
 
