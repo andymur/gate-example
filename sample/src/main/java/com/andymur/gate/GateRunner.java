@@ -1,5 +1,7 @@
 package com.andymur.gate;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import gate.*;
 import gate.corpora.DocumentImpl;
@@ -8,6 +10,7 @@ import gate.creole.ConditionalSerialAnalyserController;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
 import gate.util.GateException;
+import gate.util.InvalidOffsetException;
 import gate.util.persistence.PersistenceManager;
 
 import java.io.File;
@@ -15,12 +18,15 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Set;
 
 class GateRunner {
 
     public static final String DEFAULT_FILE_NAME = "address.txt";
 
-    public static void main(String [] args) throws MalformedURLException, ResourceInstantiationException, ExecutionException {
+    public static void main(String [] args) throws MalformedURLException, ResourceInstantiationException,
+            ExecutionException, InvalidOffsetException {
+
 		System.out.println("trying to init gate...");
         ConditionalSerialAnalyserController controller = null;
         try {
@@ -30,24 +36,47 @@ class GateRunner {
 			System.out.println(e);
 			e.printStackTrace();
 		}
-		System.out.println("initialization completed");
+
+        System.out.println("initialization completed");
+
         Corpus corpus
                 = createCorpusFromDocument("my corpus", DEFAULT_FILE_NAME);
+
         if (controller != null) {
             controller.setCorpus(corpus);
 
             System.out.println("corpus loaded");
             controller.execute();
+
             Document document = corpus.get(0);
 
-            for (Annotation annotation: document.getAnnotations().get(Sets.newHashSet("Address"))) {
-                System.out.println("get annotation of type: " + annotation.getType());
-                FeatureMap featureMap = annotation.getFeatures();
-                for (Map.Entry<Object, Object> entry: featureMap.entrySet()) {
-                    System.out.println("feature of annotation k->v: " + entry.getKey() + "->" + entry.getValue());
-                }
+            Map<String, String> nameToAnnotations = Maps.newHashMap(ImmutableMap.<String, String>of(
+                    "position", "JobTitle", "person", "Person", "address", "Address"));
+
+            for (String name: nameToAnnotations.keySet()) {
+                Set<String> content = getContentAnnotatedBy(document, nameToAnnotations.get(name));
+                System.out.println("category: " + name + " values: " + content);
             }
         }
+
+    }
+
+    private static Set<String> getContentAnnotatedBy(Document document, String annotationName)
+            throws InvalidOffsetException {
+
+        Set<String> contentList = Sets.newHashSet();
+        DocumentContent content = document.getContent();
+
+        for (Annotation annotation: document.getAnnotations().get(Sets.newHashSet(annotationName))) {
+
+            long startOffset = annotation.getStartNode().getOffset().longValue();
+            long endOffset = annotation.getEndNode().getOffset().longValue();
+
+            String annotationContent = content.getContent(startOffset, endOffset).toString();
+            contentList.add(annotationContent);
+        }
+
+        return contentList;
     }
 
 	
