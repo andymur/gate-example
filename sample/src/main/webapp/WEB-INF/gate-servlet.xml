@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <mvc:annotation-driven />
+    <mvc:default-servlet-handler/>
+
+    <context:annotation-config></context:annotation-config>
+
+    <context:component-scan base-package="com.andymur.gate" />
+
+    <bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+        <property name="resourceLoaderPath" value="/WEB-INF/views" />
+        <property name="velocityProperties">
+            <props>
+                <prop key="input.encoding">utf-8</prop>
+                <prop key="output.encoding">utf-8</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="order" value="1" />
+
+        <property name="mediaTypes">
+            <map>
+                <entry key="json" value="application/json" />
+            </map>
+        </property>
+
+        <property name="defaultViews">
+            <list>
+                <!-- JSON View -->
+                <bean
+                        class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+                </bean>
+            </list>
+        </property>
+        <property name="ignoreAcceptHeader" value="true" />
+    </bean>
+
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
+        <property name="order" value="2" />
+        <property name="cache" value="false" />
+        <property name="prefix" value="" />
+        <property name="contentType" value="text/html; charset=utf-8"></property>
+        <property name="suffix" value=".vm" />
+    </bean>
+
+    <bean id="messageSource"
+          class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basename" value="classpath:labels" />
+        <property name="defaultEncoding" value="UTF-8" />
+        <property name="fileEncodings" value="UTF-8" />
+    </bean>
+
+</beans>
