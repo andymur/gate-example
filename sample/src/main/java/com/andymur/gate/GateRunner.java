@@ -51,7 +51,7 @@ class GateRunner {
             Document document = corpus.get(0);
 
             Map<String, String> nameToAnnotations = Maps.newHashMap(ImmutableMap.<String, String>of(
-                    "position", "JobTitle", "person", "Person", "address", "Address"));
+                    "position", "JobTitle", "person", "Person", "address", "Address", "organization", "Organization"));
 
             for (String name: nameToAnnotations.keySet()) {
                 Set<String> content = getContentAnnotatedBy(document, nameToAnnotations.get(name));
