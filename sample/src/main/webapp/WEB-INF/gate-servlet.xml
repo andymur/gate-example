@@ -3,13 +3,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:gate="http://gate.ac.uk/ns/spring"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/mvc
 http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
 http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 http://www.springframework.org/schema/context
-http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://gate.ac.uk/ns/spring
+http://gate.ac.uk/ns/spring.xsd">
 
     <mvc:annotation-driven />
     <mvc:default-servlet-handler/>
@@ -17,6 +20,17 @@ http://www.springframework.org/schema/context/spring-context-3.0.xsd">
     <context:annotation-config></context:annotation-config>
 
     <context:component-scan base-package="com.andymur.gate" />
+
+    <gate:init gate-home="WEB-INF" user-config-file="WEB-INF/gate.xml">
+        <gate:preload-plugins>
+            <value>WEB-INF/plugins/ANNIE</value>
+            <!--value>http://example.org/gate-plugin</value-->
+        </gate:preload-plugins>
+    </gate:init>
+
+    <gate:duplicate id="app">
+        <gate:saved-application location="/WEB-INF/plugins/ANNIE/ANNIE_with_defaults.gapp" />
+    </gate:duplicate>
 
     <bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
         <property name="resourceLoaderPath" value="/WEB-INF/views" />
