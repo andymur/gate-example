@@ -9,6 +9,9 @@
     <logger name="com.andymur.gate" level="debug" additivity="true">
     </logger>
 
+    <logger name="gate.Gate" level="debug" additivity="true">
+    </logger>
+
     <root level="debug">
         <appender-ref ref="mainlogfile" />
     </root>

@@ -92,7 +92,8 @@ class GateRunner {
     private static Corpus createCorpusFromDocument(String name, String documentUrl)
             throws ResourceInstantiationException, MalformedURLException {
         Corpus corpus = Factory.newCorpus(name);
-        Document gateDocument = createDocumentByUrl(documentUrl);
+        //Document gateDocument = createDocumentByUrl(documentUrl);
+        Document gateDocument = createDocumentFromText("John Smith is working for IBM");
         corpus.add(gateDocument);
         return corpus;
     }
@@ -106,5 +107,9 @@ class GateRunner {
         String documentClassName = DocumentImpl.class.getCanonicalName();
         return (Document)
                 Factory.createResource(documentClassName, params);
+    }
+
+    private static Document createDocumentFromText(String text) throws ResourceInstantiationException {
+        return Factory.newDocument(text);
     }
 }

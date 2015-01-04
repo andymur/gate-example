@@ -35,6 +35,13 @@
    <div class="col1">
    </div>
    <div class="col2">
+       <form method="post" action="/annotate">
+           <textarea name="text" id="text">
+               John Smith works for IBM
+           </textarea>
+           <input type="submit" value="click!">
+           </input>
+       </form>
    </div>
   </div>
  </body>
