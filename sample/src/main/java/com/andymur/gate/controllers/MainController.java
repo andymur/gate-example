@@ -17,9 +17,11 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,10 +47,10 @@ public class MainController {
     }
 
     @RequestMapping(value = "/annotate")
-    public String annotate(HttpServletRequest request, HttpServletResponse response,
-                           @RequestParam("text") String text,
-                           ModelMap modelMap) throws ExecutionException, InvalidOffsetException {
-        logger.debug("index.enter;");
+    public @ResponseBody Map<String, Set<String>> annotate(HttpServletRequest request, HttpServletResponse response,
+                           @RequestParam("text") String text) throws ExecutionException, InvalidOffsetException {
+        logger.debug("index.enter; text = {}", text);
+        Map<String, Set<String>> result = Maps.newHashMap();
         try {
             Corpus corpus = createCorpusFromDocument("default corpus", text);
             logger.debug(controller.toString());
@@ -65,13 +67,14 @@ public class MainController {
             for (String name: nameToAnnotations.keySet()) {
                 Set<String> content = getContentAnnotatedBy(document, nameToAnnotations.get(name));
                 logger.debug("category: " + name + " values: " + content);
+                result.put(name, content);
             }
 
         } catch (ResourceInstantiationException e) {
             logger.error(e.getMessage());
         }
         logger.debug("index.exit;");
-        return "main";
+        return result;
     }
 
     private static Set<String> getContentAnnotatedBy(Document document, String annotationName)

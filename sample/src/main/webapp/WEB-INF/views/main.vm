@@ -13,6 +13,37 @@
 
 
     function initialization() {
+        $("#annotate").click(
+            annotate_handler
+        )
+    }
+
+    function annotate_handler(e) {
+        var text = $("#text").val();
+        console.log(text);
+
+        $.ajax({
+              'url': 'annotate',
+              'contentType': 'application/json; charset=UTF-8',
+              'data': {'text': text},
+              'dataType': 'json',
+              'success': onAnnotateReturn,
+              'error': function() {console.error("something went wrong");}
+            });
+    }
+
+    function onAnnotateReturn(data) {
+        console.log(data);
+        $("#address ul").empty();
+        $("#organization ul").empty();
+        $("#person ul").empty();
+        $("#position ul").empty();
+
+        $(data["person"]).each(
+            function(index, element) {
+                $("#person").append($("<li/>").text(element));
+            }
+        );
     }
 
   </script>
@@ -25,6 +56,7 @@
       margin: 0 200px 0 100px;
       font-size: 24pt;
    }
+   #text {margin: 0px 20px; display: block;}
 
   </style>
  </head>
@@ -33,13 +65,34 @@
   </div>
   <div class="layout">
    <div class="col1">
+       <ul>
+           <li id="address">
+               Address:
+               <ul>
+               </ul>
+           </li>
+           <li id="person">
+               Person:
+               <ul>
+               </ul>
+           </li>
+           <li id="organization">
+               Organization:
+               <ul>
+               </ul>
+           </li>
+           <li id="position">
+               Position:
+               <ul>
+               </ul>
+           </li>
+       </ul>
    </div>
    <div class="col2">
        <form method="post" action="/annotate">
-           <textarea name="text" id="text">
-               John Smith works for IBM
-           </textarea>
-           <input type="submit" value="click!">
+           <textarea name="text" id="text" cols="80" rows="25">John Smith works for IBM</textarea>
+           <p/>
+           <input type="button" id="annotate" value="click!">
            </input>
        </form>
    </div>
