@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import twitter4j.*;
+import twitter4j.conf.ConfigurationBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -77,6 +79,14 @@ public class MainController {
         return result;
     }
 
+    @RequestMapping(value = "/load")
+    public @ResponseBody Set<String> loadFromTwitter(HttpServletRequest request, HttpServletResponse response,
+                                                     @RequestParam("twitterId") String twitterId,
+                                                     @RequestParam("top") Integer top) throws TwitterException {
+        logger.debug("loadFromTwitter; twitterId = {}, top = {}", twitterId, top);
+        return loadTopTweets(twitterId, top);
+    }
+
     private static Set<String> getContentAnnotatedBy(Document document, String annotationName)
             throws InvalidOffsetException {
 
@@ -98,13 +108,30 @@ public class MainController {
     private static Corpus createCorpusFromDocument(String name, String documentContent)
             throws ResourceInstantiationException {
         Corpus corpus = Factory.newCorpus(name);
-        //Document gateDocument = createDocumentByUrl(documentContent);
-        Document gateDocument = createDocumentFromText("John Smith is working for IBM");
+        Document gateDocument = createDocumentFromText(documentContent);
         corpus.add(gateDocument);
         return corpus;
     }
 
     private static Document createDocumentFromText(String text) throws ResourceInstantiationException {
         return Factory.newDocument(text);
+    }
+
+    private static Set<String> loadTopTweets(String twitterId, int top) throws TwitterException {
+        Set<String> result = Sets.newHashSet();
+        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+        configurationBuilder.setOAuthConsumerKey("JUhgYNKKsiVhmOgkOGGEOkvaI");
+        configurationBuilder.setOAuthConsumerSecret("Gum07oMrsoJxk48AoWu4v1MP977ASOM20yjTMBea4zATLs6eIV");
+        configurationBuilder.setOAuthAccessToken("184537064-9wFFenKKxYDYUiMJRFrtlklxNPpJSFNkaWFVmFEt");
+        configurationBuilder.setOAuthAccessTokenSecret("SS2Jyoz6BpM0CcZlSOxbj8n58a91z8Moe31ICi88bYq8g");
+
+        Twitter twitter = new TwitterFactory(configurationBuilder.build()).getInstance();
+
+        Paging paging = new Paging(1, top);
+        List<Status> statuses = twitter.getUserTimeline(twitterId, paging);
+        for (Status status: statuses) {
+            result.add(status.getText());
+        }
+        return result;
     }
 }

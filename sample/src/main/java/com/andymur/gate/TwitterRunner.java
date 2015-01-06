@@ -19,9 +19,12 @@ public class TwitterRunner {
 
         Twitter twitter = new TwitterFactory(configurationBuilder.build()).getInstance();
         //First param of Paging() is the page number, second is the number per page (this is capped around 200 I think.
-        Paging paging = new Paging(1, 10);
+        Paging paging = new Paging(1, 5);
         List<Status> statuses = twitter.getUserTimeline("google", paging);
         System.out.println(statuses.get(0).getText());
 
+        for (Status status: statuses) {
+            System.out.println(status.getText());
+        }
     }
 }

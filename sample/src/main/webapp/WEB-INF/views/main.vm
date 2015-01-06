@@ -15,7 +15,37 @@
     function initialization() {
         $("#annotate").click(
             annotate_handler
-        )
+        );
+
+        $("#load_from_twitter").click(
+            twitter_handler
+        );
+    }
+
+    function twitter_handler(e) {
+        var twitter_id = $("#twitter_id").val();
+        var top = $("#tweets_count").val();
+        console.log(twitter_id, top);
+
+        $.ajax({
+              'url': 'load',
+              'contentType': 'application/json; charset=UTF-8',
+              'data': {'twitterId': twitter_id, 'top': top},
+              'dataType': 'json',
+              'success': onTwitterLoad,
+              'error': function() {console.error("something went wrong");}
+            });
+    }
+
+    function onTwitterLoad(data) {
+        console.log(data);
+        var textBox = $("#text");
+        var tweets = "";
+        for (index in data) {
+            tweets += data[index] + "\n";
+        }
+
+        textBox.text(tweets);
     }
 
     function annotate_handler(e) {
@@ -34,14 +64,19 @@
 
     function onAnnotateReturn(data) {
         console.log(data);
-        $("#address ul").empty();
-        $("#organization ul").empty();
-        $("#person ul").empty();
-        $("#position ul").empty();
 
-        $(data["person"]).each(
-            function(index, element) {
-                $("#person").append($("<li/>").text(element));
+        cleanAndFill(data, "person", $("#person ul"));
+        cleanAndFill(data, "organization", $("#organization ul"));
+        cleanAndFill(data, "position", $("#position ul"));
+        cleanAndFill(data, "address", $("#address ul"));
+    }
+
+    function cleanAndFill(data, category, categoryListElement) {
+        categoryListElement.empty();
+
+        $(data[category]).each(
+            function (index, element) {
+                categoryListElement.append($("<li/>").text(element));
             }
         );
     }
@@ -51,12 +86,17 @@
 
    .header{ height: 50px; margin-bottom: 10px;}
    .layout { overflow: hidden; clear: both;}
-   .col1 { float: left; width: 200px; font-size: 16pt; border-right: solid 1px; height: 600px;}
+   .col1 { float: left; width: 300px; font-size: 16pt; border-right: solid 1px; height: 600px;}
    .col2 {  
       margin: 0 200px 0 100px;
       font-size: 24pt;
    }
-   #text {margin: 0px 20px; display: block;}
+
+   #categories > li {list-style: none}
+   #categories ul li {list-style: none; font-size: 14pt;}
+   #text {display: block;}
+   #annotate_form {margin: 0px 250px; font-size: 16pt;}
+   #load_from_twitter {margin: 20px 0px;}
 
   </style>
  </head>
@@ -65,7 +105,8 @@
   </div>
   <div class="layout">
    <div class="col1">
-       <ul>
+       <h3>Categories:</h3>
+       <ul id="categories">
            <li id="address">
                Address:
                <ul>
@@ -89,10 +130,22 @@
        </ul>
    </div>
    <div class="col2">
-       <form method="post" action="/annotate">
-           <textarea name="text" id="text" cols="80" rows="25">John Smith works for IBM</textarea>
+       <span>Fill text box with your own data or load it from Twitter</span>
+       <form method="post" action="/annotate" id="annotate_form">
+           <span>twitter:</span>
+           <input type="text" value="google" id="twitter_id"/>
+           <span>top N tweets:</span>
+           <input type="text" value="5" id="tweets_count"/>
+           <input type="button" value="load from Twitter" id="load_from_twitter"/>
+           <textarea name="text" id="text" cols="80" rows="25">Best regards,
+John Smith
+Assistance Manager
+Something, Inc.
+www.something.org
+j.smith@smth.net
+ph: 650-222-1133 ext. 9911</textarea>
            <p/>
-           <input type="button" id="annotate" value="click!">
+           <input type="button" id="annotate" value="annotate!">
            </input>
        </form>
    </div>
