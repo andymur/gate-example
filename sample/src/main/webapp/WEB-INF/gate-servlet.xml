@@ -21,16 +21,17 @@ http://gate.ac.uk/ns/spring.xsd">
 
     <context:component-scan base-package="com.andymur.gate" />
 
-    <gate:init gate-home="WEB-INF" user-config-file="WEB-INF/gate.xml">
+    <context:property-placeholder location="classpath:gate.properties" />
+
+    <!--gate:init gate-home="WEB-INF" user-config-file="WEB-INF/gate.xml">
         <gate:preload-plugins>
             <value>WEB-INF/plugins/ANNIE</value>
-            <!--value>http://example.org/gate-plugin</value-->
         </gate:preload-plugins>
     </gate:init>
 
     <gate:duplicate id="app">
         <gate:saved-application location="/WEB-INF/plugins/ANNIE/ANNIE_with_defaults.gapp" />
-    </gate:duplicate>
+    </gate:duplicate-->
 
     <bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
         <property name="resourceLoaderPath" value="/WEB-INF/views" />

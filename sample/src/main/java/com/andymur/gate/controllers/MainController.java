@@ -1,5 +1,7 @@
 package com.andymur.gate.controllers;
 
+import com.andymur.gate.helpers.GateHelper;
+import com.andymur.gate.helpers.TwitterHelper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -7,10 +9,12 @@ import gate.*;
 import gate.creole.ConditionalSerialAnalyserController;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
+import gate.util.GateException;
 import gate.util.InvalidOffsetException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -23,6 +27,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,29 +36,27 @@ import java.util.Set;
 @Scope("request")
 public class MainController {
     private Logger logger = LoggerFactory.getLogger(getClass());
+    private String gateHome;
+    private String pluginDir;
+    private String userConfig;
 
-    @Autowired
     gate.Controller controller;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(HttpServletRequest request, HttpServletResponse response, ModelMap modelMap) {
         logger.debug("index.enter;");
-
-        try {
-            Factory.newCorpus("default corpus");
-        } catch (ResourceInstantiationException e) {
-
-        }
         logger.debug("index.exit;");
         return "main";
     }
 
     @RequestMapping(value = "/annotate")
     public @ResponseBody Map<String, Set<String>> annotate(HttpServletRequest request, HttpServletResponse response,
-                           @RequestParam("text") String text) throws ExecutionException, InvalidOffsetException {
+                           @RequestParam("text") String text) throws GateException, IOException {
         logger.debug("index.enter; text = {}", text);
         Map<String, Set<String>> result = Maps.newHashMap();
+        logger.debug("context path: " + request.getContextPath());
         try {
+            controller= GateHelper.getController(gateHome, pluginDir, userConfig);
             Corpus corpus = createCorpusFromDocument("default corpus", text);
             logger.debug(controller.toString());
             ((ConditionalSerialAnalyserController)controller).setCorpus(corpus);
@@ -85,6 +88,21 @@ public class MainController {
                                                      @RequestParam("top") Integer top) throws TwitterException {
         logger.debug("loadFromTwitter; twitterId = {}, top = {}", twitterId, top);
         return loadTopTweets(twitterId, top);
+    }
+
+    @Value("${gate.home}")
+    public void setGateHome(String gateHome) {
+        this.gateHome = gateHome;
+    }
+
+    @Value("${gate.plugin_dir}")
+    public void setPluginDir(String pluginDir) {
+        this.pluginDir = pluginDir;
+    }
+
+    @Value("${gate.site_config}")
+    public void setUserConfig(String userConfig) {
+        this.userConfig = userConfig;
     }
 
     private static Set<String> getContentAnnotatedBy(Document document, String annotationName)
@@ -119,13 +137,8 @@ public class MainController {
 
     private static Set<String> loadTopTweets(String twitterId, int top) throws TwitterException {
         Set<String> result = Sets.newHashSet();
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-        configurationBuilder.setOAuthConsumerKey("JUhgYNKKsiVhmOgkOGGEOkvaI");
-        configurationBuilder.setOAuthConsumerSecret("Gum07oMrsoJxk48AoWu4v1MP977ASOM20yjTMBea4zATLs6eIV");
-        configurationBuilder.setOAuthAccessToken("184537064-9wFFenKKxYDYUiMJRFrtlklxNPpJSFNkaWFVmFEt");
-        configurationBuilder.setOAuthAccessTokenSecret("SS2Jyoz6BpM0CcZlSOxbj8n58a91z8Moe31ICi88bYq8g");
 
-        Twitter twitter = new TwitterFactory(configurationBuilder.build()).getInstance();
+        Twitter twitter = TwitterHelper.getInstance();
 
         Paging paging = new Paging(1, top);
         List<Status> statuses = twitter.getUserTimeline(twitterId, paging);
